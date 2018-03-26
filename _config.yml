@@ -10,7 +10,7 @@ name: "Bio's Notebook"
 url: https://justbio.github.io/
 domain: justbio.github.io
 all_categories: [
-["program", "python编程","/posts/program.html"],
+["program", "python","/posts/program.html"],
 ["web", "Web建站","/posts/web.html"],
 ["linux", "Linux相关","/posts/linux.html"],
 ["read", "学习笔记","/posts/read.html"],
