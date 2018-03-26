@@ -13,7 +13,7 @@ title:  "ZABBIX_AGENT的安装配置"
 
 修改配置文件
 >[root@agtest etc]# vi /etc/zabbix/zabbix_agentd.conf
- <!--more-->
+"<!-- more -->"
 修改这几个参数就能连上zabbix服务器了
 >Server=[zabbix服务器IP]  
 ServerActive= [zabbix服务器IP]  
