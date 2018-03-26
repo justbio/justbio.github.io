@@ -10,7 +10,7 @@ title:  "ZABBIX3.0+CENTOS7.0+MARIADB5.5监视服务器安装"
 `Zabbix3.0`
 `MariaDB5.5`
 
-## 2016/12/2更新
+### 2016/12/2更新
 
 最新的Centos7.1或者Redhat7.1版本在最后启动zabbix-server的时候会报错无法启动
 
@@ -26,7 +26,7 @@ See 'systemctl status zabbix-server.service' and 'journalctl -xn' for details.
 另外，用Redhat的源会少两个PHP的包php-mbstring，php-bcmath，
 请修改成Centos的源或者163源后继续安装
 
-## 原文
+### 原文
 系统安装完成后，关闭selinux，防火墙
 
 >[root@testz ~]#vi /etc/selinux/config  
@@ -44,7 +44,7 @@ SELINUX=disabled
 >[root@testz ~]# systemctl restart firewalld  
 >重启
 
-###Zabbix安装
+### Zabbix安装
 
 下载安装源
 
