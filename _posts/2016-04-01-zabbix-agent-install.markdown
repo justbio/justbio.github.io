@@ -4,7 +4,7 @@ category: "zabbix"
 title:  "ZABBIX_AGENT的安装配置"
 ---
 
-###在Linux上安装zabbix agent
+## 在Linux上安装zabbix agent
 
 安装
 
@@ -38,7 +38,7 @@ Hostname= [本机的hostname]
 >[root@agtest etc]# systemctl start zabbix-agent  
 [root@agtest etc]# systemctl enable zabbix-agent
 
-###在Windows上安装zabbix agent
+## 在Windows上安装zabbix agent
 
 从官网下载zabbix agent的安装包
 >http://www.zabbix.com/downloads/3.0.0/zabbix_agents_3.0.0.win.zip
