@@ -11,10 +11,10 @@ url: https://justbio.github.io/
 domain: justbio.github.io
 all_categories: [
 ["python", "python编程","/posts/program.html"],
-["web", "Web建站","/posts/web.html"], 
+["web", "Web建站","/posts/web.html"],
 ["linux", "Linux相关","/posts/linux.html"],
-["notebook", "学习笔记","/posts/read.html"], 
-["github", "Github","/posts/read.html"], 
+["notebook", "学习笔记","/posts/read.html"],
+["github", "Github","/posts/github.html"], 
 ["other", "杂记","/posts/other.html"],
 ["about", "关于","/about.html"]
 ]
