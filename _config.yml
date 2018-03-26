@@ -1,5 +1,5 @@
 markdown: kramdown
-rouge: pygments
+highlighter: rouge
 permalink: /posts/:title.html
 excerpt_separator: "<!-- more -->"
 
@@ -32,3 +32,5 @@ gems:
 
 layout: default
 comments: true
+
+excerpt_separator: <!--more-->

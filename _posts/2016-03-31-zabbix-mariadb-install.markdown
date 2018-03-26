@@ -18,9 +18,9 @@ title:  "ZABBIX3.0+CENTOS7.0+MARIADB5.5监视服务器安装"
 Job for zabbix-server.service failed.  
 See 'systemctl status zabbix-server.service' and 'journalctl -xn' for details.
 
-是因为少一个依赖包，只要安装就好了
+是因为少一个依赖包，只要安装就好了  
 yum install trousers
-
+<!--more-->
 另外，用Redhat的源会少两个PHP的包php-mbstring，php-bcmath，
 请修改成Centos的源或者163源后继续安装
 
