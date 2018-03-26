@@ -32,5 +32,3 @@ gems:
 
 layout: default
 comments: true
-
-excerpt_separator: <!--more-->
