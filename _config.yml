@@ -1,4 +1,6 @@
 markdown: kramdown
+kramdown:
+  input: GFM
 highlighter: rouge
 permalink: /posts/:title.html
 excerpt_separator: "<!-- more -->"
