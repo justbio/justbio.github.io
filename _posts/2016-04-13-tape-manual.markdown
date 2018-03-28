@@ -93,9 +93,9 @@ File Number=0 Block Number=-1
 是指磁头在上图的4处或5处等等，处于不可用的位置  
 
 ### 非回卷设备的常用磁头操作
-命令（设备统一为nst0）|说明|完成后磁头位置变化|
-:-|:-|:-
-|tar -cvf /dev/nst0 文件名|写入文件|File Number加1，Block Number=0
+|命令（设备统一为nst0）|说明|完成后磁头位置变化| 
+|-|-|-|
+|tar -cvf /dev/nst0 文件名|写入文件|File Number加1，Block Number=0|
 |tar -xvf /dev/nst0 文件名|读出文件|File Number不变，Block Number变为文件末尾的block号码|
 |tar -tvf /dev/nst0|列出文件列表|File Number不变，Block Number变为文件末尾的block号码|
 |mt -f /dev/nst0 status|查看磁头位置|不变|
