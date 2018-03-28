@@ -1,7 +1,7 @@
 ---
 layout: post
 category: "linux"
-title:  "ZABBIX_SERVER.CONF 的性能调优"
+title:  "KEEPALIVED+TOMCAT的HA配置"
 ---
 
 节点  
@@ -15,6 +15,8 @@ VIP—————-IP：192.168.0.10
 >vi /etc/hosts
 node1    192.168.0.2  
 node2    192.168.0.3  
+
+<!--more-->
 
 安装keepalived
 >yum install keepalived
