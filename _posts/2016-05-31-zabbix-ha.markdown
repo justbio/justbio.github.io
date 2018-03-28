@@ -1,0 +1,6 @@
+---
+layout: post
+category: "zabbix"
+title:  "NGINX.CONF各参数的意义"
+---
+
