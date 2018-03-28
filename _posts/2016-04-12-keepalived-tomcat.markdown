@@ -9,7 +9,9 @@ title:  "KEEPALIVED+TOMCAT的HA配置"
 NODE2—————-IP：192.168.0.3  
 VIP—————-IP：192.168.0.10
 
-以下操作在2台机器上都要运行 
+以下操作在2台机器上都要运行
+
+<!-- more -->
 
 先编辑hosts
 >vi /etc/hosts

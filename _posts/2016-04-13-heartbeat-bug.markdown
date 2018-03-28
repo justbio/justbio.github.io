@@ -10,6 +10,8 @@ title:  "HEARTBEAT的两个小BUG"
 可能会发现打了service heartbeat start后什么反应也没有。 
 其实是这个网站里的软件默认配置写错了，做以下的修改就能解决。
 
+<!-- more -->
+
 >vi /usr/lib/ocf/resource.d/heartbeat/.ocf-directories  
 : ${HA_BIN:=/usr/libexec/heartbeat}  
 改成  
