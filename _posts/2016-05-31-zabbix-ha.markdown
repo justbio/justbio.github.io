@@ -1,6 +1,535 @@
 ---
 layout: post
 category: "zabbix"
-title:  "NGINX.CONF各参数的意义"
+title:  "ZABBIX冗余架构构筑（CENTOS6.4+PACEMAKER+COROSYNC+DRBD）"
 ---
 
+基本构成：
+
+1. 用pacemaker+corosync控制心跳和资源迁移
+2. 用drbd同步zabbix配置文件和mysql数据库
+3. 所有软件都用yum安装至默认路径
+4. 主机的drbd领域挂载至/drbd，备机不挂载
+5. 主机在drbd领域中创建/drbd/zabbix，挂载至/etc/zabbix，备机不挂载
+6. 主机在drbd领域中创建/drbd/mysql，挂载至/var/lib/mysql，备机不挂载
+ 
+主机正常时如左图，主机故障时如右图  
+![](../assets/739083-20160531140053571-494188360.jpg)
+
+![](../assets/table2.PNG)
+*OS安装的时候只需要分出sda1和sda2，其他的空出来。等系统安装完毕后用fdisk分出sda3，并且先不要格式化。
+
+#### 正式作业前：
+
+1. 关闭selinux
+2. 关闭iptables
+3. /etc/hosts 互相添加
+4. NTP同步设定
+5. 在网卡配置文件中加入NOZEROCONF=yes，禁止一些不必要的路由信息自动生成
+6. 修改/etc/ssh/sshd_conf的 UseDNS参数为no，这样ssh登录的时候会快点
+7. fdisk生成/dev/sda3，从sda3中取出剩余的450GB做成lv_drbd用作drbd领域，先不要格式化分区
+
+#### 正式作业：
+
+1，drbd安装
+
+安装elpl的repodata
+
+>rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org  
+rpm -Uvh http://www.elrepo.org/elrepo-release-6-6.el6.elrepo.noarch.rpm  
+yum install drbd83-utils kmod-drbd83 
+
+这里要注意一点，kmod-drbd的版本要和内核版本匹配，不然drbd会报错无法启动。  
+但是我找遍了googlebaidu也没有找到列表，只能把我知道的写出来。  
+
+>kmod-drbd83-8.3.13-1 对应kernel 2.6.32-358
+kmod-drbd83-8.3.13-3 对应kernel 2.6.32- 573.22.1
+
+关闭drbd的自启动
+
+>chkconfig drbd off
+
+编辑配置文件
+
+>vi /etc/drbd.d/r0.res
+
+```
+resource r0 { 
+  protocol C; 
+  net { 
+    max-buffers 1000; 
+    max-epoch-size 1000; 
+    sndbuf-size 0; 
+  } 
+  handlers { 
+    fence-peer "/usr/lib/drbd/crm-fence-peer.sh"; 
+    after-resync-target "/usr/lib/drbd/crm-unfence-peer.sh"; 
+  } 
+  syncer { 
+    rate 80M; 
+    use-rle; 
+    verify-alg md5; 
+  } 
+  disk{ 
+    fencing resource-only; 
+    on-io-error detach; 
+  } 
+  device /dev/drbd0; 
+  on ZAB01 { 
+    address 192.168.222.196:7788; 
+    disk /dev/vg_drbd/lv_drbd; 
+    meta-disk internal; 
+  } 
+  on ZAB02 { 
+    address 192.168.222.197:7788; 
+    disk /dev/vg_drbd/lv_drbd; 
+    meta-disk internal; 
+  } 
+} 
+```
+
+初始化盘
+
+>drbdadm create-md r0
+
+如果报这个错
+
+>Device size would be truncated, which  
+would corrupt data and result in  
+'access beyond end of device' errors.  
+You need to either  
+* use external meta data (recommended)  
+* shrink that filesystem first  
+* zero out the device (destroy the filesystem)  
+Operation refused.
+
+打这个命令后再执行一次初始化就好了
+
+>dd if=/dev/zero bs=1M count=1 of=/dev/vg_drbd/lv_drbd
+
+两边服务器上启动drbd
+
+>/etc/init.d/drbd start
+
+把ZAB01V这边升为主机
+
+>drbdadm -- --overwrite-data-of-peer primary r0
+
+主机这边格式化
+
+>mkfs.ext4 /dev/drbd0
+
+两边都做个文件夹，用来挂载drbd的盘
+
+>mkdir /drbd
+
+主机这边挂载
+
+>mount /dev/drbd0 /drbd/
+
+2，mysql安装
+
+安装mysql的repodata
+
+>wget http://dev.mysql.com/get/mysql57-community-release-el6-8.noarch.rpm  
+rpm -ivh mysql57-community-release-el6-8.noarch.rpm
+
+默认会安装的是mysql5.7，如果需要5.6或者5.5的话可以修改repo文件，我装的是5.6
+
+>vi /etc/yum.repos.d/mysql-community.repo
+
+把对应版本的
+
+>[mysql56-community]下面的  
+enabled=0改成enabled=1  
+[mysql57-community]下面的  
+enabled=1改成enabled=0
+
+安装mysql
+
+>yum install mysql-server mysql-devel
+
+关闭mysql的自启动
+
+>chkconfig mysqld off
+
+创建文件夹用来放DRBD用的mysql数据
+
+>mkdir /drbd/mysql  
+chmod 700 /drbd/mysql  
+chown mysql.mysql /drbd/mysql
+
+以下只需要在主机上配置，备机反正是用drbd里的数据，只要保证mysql能启动就可以了。
+
+编辑配置文件
+
+按主机的性能自行修改，以下是我4核8G内存主机配置
+
+vi /etc/my.cnf
+```
+[mysqld] 
+datadir=/var/lib/mysql 
+socket=/var/lib/mysql/mysql.sock 
+character-set-server = utf8 
+collation-server = utf8_bin 
+skip-character-set-client-handshake 
+skip-external-locking 
+symbolic-links=0 
+innodb_buffer_pool_size = 2048M 
+innodb_log_file_size = 512M 
+sort_buffer_size = 2M 
+innodb_additional_mem_pool_size = 30M 
+innodb_log_buffer_size = 8M 
+key_buffer_size = 16M 
+innodb_data_file_path = ibdata1:1G 
+innodb_file_per_table 
+log-error=/var/log/mysqld.log 
+pid-file=/var/run/mysqld/mysqld.pid 
+```
+
+挂载
+
+>mount -o bind /drbd/mysql /var/lib/mysql/
+
+启动mysql
+
+>service mysqld start
+
+创建zabbix用的DB和账号
+
+>create database zabbix;  
+grant all privileges on zabbix.* to zabbix@localhost identified by 'YOURPWD' ;  
+flush privileges;  
+exit
+
+3，zabbix安装配置
+
+安装zabbix2.4.1的repodata
+
+>wget http://repo.zabbix.com/zabbix/2.4/rhel/6/x86_64/zabbix-release-2.4-1.el6.noarch.rpm  
+rpm -ivh zabbix-release-2.4-1.el6.noarch.rpm
+
+安装zabbix
+
+>yum install zabbix-server-mysql zabbix-web-mysql zabbix-get zabbix-agent
+
+因为agent不需要冗余，设置开机启动
+
+>chkconfig zabbix-agent on
+
+创建文件夹用来放DRBD用的zabbix配置文件
+
+>mkdir /drbd/zabbix
+
+把http的配置也改了
+
+>vi /etc/httpd/conf.d/zabbix.conf  
+php_value date.timezone Asia/Shanghai
+
+以下同样只需要在主机上配置，备机只要保证zabbix能启动就可以了。
+
+导入zabbix的模板
+
+>cd /usr/share/doc/zabbix-server-mysql-2.4.7/create  
+mysql zabbix < schema.sql  
+mysql zabbix < images.sql  
+mysql zabbix < data.sql  
+
+配置zabbix_server.conf
+
+>vi /etc/zabbix/zabbix_server.conf
+```
+#必须的参数 
+DBPassword=YOURPWD 
+#以下参数是性能优化参数 
+StartPollers=30 
+StartPollersUnreachable=3 
+StartTrappers=5 
+StartPingers=5 
+StartDiscoverers=5 
+MaxHousekeeperDelete=20000 
+CacheSize=64M 
+StartDBSyncers=4 
+HistoryCacheSize=128M 
+ValueCacheSize=128M 
+TrendCacheSize=4M 
+HistoryTextCacheSize=16M 
+```
+
+如果需要的话，可以把mysql的patitioning也做了。
+参考我的另一篇博文
+[MARIADB5.5（MYSQL）的PARTITIONING设置 FOR ZABBIX3.0](https://justbio.github.io/posts/partitioning.html)
+
+开启zabbix
+
+>service zabbix-server start  
+service zabbix-agent start  
+service httpd start
+
+打开网页配置zabbix的页面
+
+http://192.168.0.6/zabbix
+
+配置完成后关闭zabbix
+
+>service zabbix-server stop  
+service zabbix-agent stop  
+service httpd stop  
+service mysqld stop  
+
+因为最终要同步的文件夹是/drbd，  
+所以把zabbix的配置文件拷贝到DRBD的文件夹中。  
+加上-p是为了保持权限不变
+
+>cp -rp /etc/zabbix/* /drbd/zabbix/
+
+写个文件到/drbd/mysql和/drbd/zabbix里面去
+
+>touch /drbd/zabbix/1.txt
+
+挂载看看有没有问题
+
+>mount -o bind /drbd/zabbix/ /etc/zabbix/  
+ls /etc/zabbix/  
+1.txt web zabbix_agentd.conf zabbix_agentd.d zabbix_server.conf
+
+里面都能看到有1.txt
+
+记住umount掉
+
+>umount /var/lib/mysql/  
+umount /etc/zabbix/
+
+关闭drbd
+
+>/etc/init.d/drbd stop
+
+4，pacemaker安装配置
+
+首先确认没有进程在启动着（zabbix-agent没关系）
+
+>ps -ef |grep zabbix |grep -v grep  
+ps -ef |grep drbd |grep -v grep  
+ps -ef |grep http |grep -v grep  
+ps -ef |grep mysql |grep -v grep
+
+安装pacemaker的源
+
+因为clusterlabs.org的pacemaker源默认安装的是cman，我还是喜欢用corosync和heartbeat  
+所以用的是linux-ha.jp的源，墙内下载源可能要FQ。
+
+>wget https://osdn.jp/frs/redir.php?m=iij&f=%2Flinux-ha%2F63919%2Fpacemaker-repo-1.1.13-1.1.el6.x86_64.rpm  
+rpm -ivh pacemaker-repo-1.1.13-1.1.el6.x86_64.rpm
+
+安装pacemaker
+
+>yum install pacemaker corosync crmsh glib2
+
+配置corosync
+
+>vi /etc/corosync/corosync.conf
+```
+service { 
+  name: pacemaker 
+  ver: 0 
+  use_mgmtd: yes 
+} 
+totem { 
+  version: 2 
+  token: 4000 
+  consensus: 10000 
+  rrp_problem_count_timeout: 3000 
+  rrp_mode: active 
+  interface { 
+    member { 
+      memberaddr: 192.168.222.196 
+    } 
+    member { 
+      memberaddr: 192.168.222.197 
+    } 
+    ringnumber: 0 
+    bindnetaddr: 192.168.222.0 
+    mcastport: 5405 
+    ttl: 1 
+  } 
+  transport: udpu 
+} 
+logging { 
+  fileline: off 
+  to_stderr: no 
+  to_logfile: yes 
+  logfile: /var/log/cluster/corosync.log 
+  to_syslog: yes 
+  debug: off 
+  timestamp: on 
+  logger_subsys { 
+    subsys: QUORUM 
+    debug: off 
+  } 
+} 
+quorum { 
+  provider: corosync_votequorum 
+  expected_votes: 2 
+} 
+```
+
+启动pacemaker
+
+>service corosync start  
+service pacemaker start
+
+编辑crm配置文件
+
+>crm  
+configure   
+edit
+
+```
+node 3232292549: ZAB01 
+node 3232292550: ZAB02 
+primitive res_drbd_r0 ocf:linbit:drbd \ 
+  params drbd_resource=r0 \ 
+  op start interval=0 timeout=240 \ 
+  op stop interval=0 timeout=100 
+primitive res_httpd apache \ 
+  params configfile="/etc/httpd/conf/httpd.conf" \ 
+  op start interval=0 timeout=40 \ 
+  op stop interval=0 timeout=120 \ 
+  op monitor interval=30 timeout=30 
+primitive res_ip IPaddr2 \ 
+  params ip=192.168.0.8 cidr_netmask=24 \ 
+  op monitor interval=50 timeout=30 
+  primitive res_mount Filesystem \ 
+  params device="/dev/drbd0" fstype=ext4 directory="/drbd" options=noatime \ 
+  op monitor interval=10 timeout=60 \ 
+  op start interval=0 timeout=60 \ 
+  op stop interval=0 timeout=60 
+primitive res_mount_mysql Filesystem \ 
+  params device="/drbd/mysql" fstype=ext4 directory="/var/lib/mysql" 
+  options="bind,noatime" \ 
+  op monitor interval=10 timeout=60 \ 
+  op start interval=0 timeout=60 \ 
+  op stop interval=0 timeout=60 
+primitive res_mount_zabbix Filesystem \ 
+  params device="/drbd/zabbix" fstype=ext4 directory="/etc/zabbix" options="bind,noatime" \ 
+  op monitor interval=10 timeout=60 \ 
+  op start interval=0 timeout=60 \ 
+  op stop interval=0 timeout=60 
+primitive res_mysqld mysql \ 
+  op start interval=0 timeout=120 \ 
+  op stop interval=0 timeout=120 \ 
+  op monitor interval=30 timeout=30 
+primitive res_srcaddr IPsrcaddr \ 
+  params ipaddress=192.168.0.8 \ 
+  op monitor interval=50 timeout=30 
+primitive res_zabbix_server lsb:zabbix-server \ 
+  op start interval=0 timeout=30 \ 
+  op stop interval=0 timeout=120 \ 
+  op monitor interval=30 timeout=30 
+group zabbix res_mount res_mount_mysql res_mount_zabbix res_ip res_srcaddr \     
+  res_httpd res_mysqld res_zabbix_server 
+ms ms_drbd_r0 res_drbd_r0 \ 
+  meta master-max=1 master-node-max=1 \ 
+  clone-max=2 clone-node-max=1 notify=true 
+location l_zabbix zabbix 100: VCCZAB01V 
+colocation c_zabbix inf: zabbix ms_drbd_r0:Master 
+order o_zabbix inf: ms_drbd_r0:promote zabbix:start 
+  property cib-bootstrap-options: \ 
+  have-watchdog=false \ 
+  dc-version=1.1.13-6052cd1 \ 
+  cluster-infrastructure=corosync \ 
+  default-resource-stickiness=200 \ 
+  no-quorum-policy=ignore \ 
+stonith-enabled=false
+```
+配置完成后
+
+>commit
+
+退出crm后打crm_mon查看
+
+>crm_mon
+
+```
+Online: [ ZAB01 ZAB02 ] 
+Master/Slave Set: ms_drbd_r0 [res_drbd_r0] 
+Masters: [ ZAB01 ] 
+Slaves: [ ZAB02 ] 
+Resource Group: zabbix 
+res_mount (ocf::heartbeat:Filesystem): Started ZAB01 
+res_mount_mysql (ocf::heartbeat:Filesystem): Started ZAB01 
+res_mount_zabbix (ocf::heartbeat:Filesystem): Started ZAB01 
+res_ip (ocf::heartbeat:IPaddr2): Started ZAB01 
+res_srcaddr (ocf::heartbeat:IPsrcaddr): Started ZAB01 
+res_httpd (ocf::heartbeat:apache): Started ZAB01 
+res_mysqld (ocf::heartbeat:mysql): Started ZAB01 
+res_zabbix_server (lsb:zabbix-server): Started ZAB01 
+```
+
+查看drbd状态
+
+>service drbd status
+
+刚开始会显示同步的进度条，同步完成后，两边的状态分别如下
+
+主机上
+```
+drbd driver loaded OK; device status: 
+version: 8.3.16 (api:88/proto:86-97) 
+GIT-hash: a798fa7e274428a357657fb52f0ecf40192c1985 build by phil@Build64R6, 2014-11-24 14:51:37 
+m:res cs ro ds p mounted fstype 
+0:r0 Connected Primary/Secondary UpToDate/UpToDate C /drbd ext4 
+0:r0 Connected Primary/Secondary UpToDate/UpToDate C /etc/zabbix ext4 
+0:r0 Connected Primary/Secondary UpToDate/UpToDate C /var/lib/mysql ext4 
+```
+
+备机上
+```
+drbd driver loaded OK; device status: 
+version: 8.3.13 (api:88/proto:86-96) 
+GIT-hash: 83ca112086600faacab2f157bc5a9324f7bd7f77 build by dag@Build64R6, 2012-05-07 11:52:13 
+m:res cs ro ds p mounted fstype 
+0:r0 Connected Secondary/Primary UpToDate/UpToDate C 
+```
+
+系统构筑完成
+
+
+#### 测试：
+
+关闭主机的pacemaker和corosync
+
+>service pacemaker stop   
+service corosync stop
+
+然后在备机上查看状态
+
+>crm_mon
+
+```
+Online: [ZAB02 ] 
+Offline: [ZAB01 ] 
+Master/Slave Set: ms_drbd_r0 [res_drbd_r0] 
+Masters: [ ZAB02 ] 
+Resource Group: zabbix 
+res_mount (ocf::heartbeat:Filesystem): Started ZAB02 
+res_mount_mysql (ocf::heartbeat:Filesystem): Started ZAB02 
+res_mount_zabbix (ocf::heartbeat:Filesystem): Started ZAB02 
+res_ip (ocf::heartbeat:IPaddr2): Started ZAB02 
+res_srcaddr (ocf::heartbeat:IPsrcaddr): Started ZAB02 
+res_httpd (ocf::heartbeat:apache): Started ZAB02 
+res_mysqld (ocf::heartbeat:mysql): Started ZAB02 
+res_zabbix_server (lsb:zabbix-server): Started ZAB02 
+```
+
+>service drbd status
+
+```
+drbd driver loaded OK; device status: 
+version: 8.3.16 (api:88/proto:86-97) 
+GIT-hash: a798fa7e274428a357657fb52f0ecf40192c1985 build by phil@Build64R6, 2014-11-24 14:51:37 
+m:res cs ro ds p mounted fstype 
+0:r0 Connected Primary/Unknow UpToDate/DUnknown C /drbd ext4 
+0:r0 Connected Primary/Unknow UpToDate/DUnknown C /etc/zabbix ext4 
+0:r0 Connected Primary/Unknow UpToDate/DUnknown C /var/lib/mysql ext4 
+```
