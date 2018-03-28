@@ -1,0 +1,107 @@
+---
+layout: post
+category: "python"
+title:  "日志查找到第一个关键字后反向查找第二个关键字"
+---
+
+用户的一个需求
+
+catalina.out的日志中，先找到第一个关键字，  然后向上查找第二个关键字，写个小脚本
+
+由于不能改客户的环境，所以是python2的
+
+```
+#!/usr/bin/python 
+import datetime, time
+import re
+import os
+#取得文件名，文件名的时间格式是收到报警的时间减去一小时
+def get_filename(input_str):
+    #如果有输入，整理格式后减去一小时
+    if input_str:
+        t=datetime.datetime.strptime(input_str, "%Y%m%d%H") + datetime.timedelta(hours=-1)
+    #如果无输入，则默认为现在时间再减去一小时
+    else:
+        t=datetime.datetime.now() + datetime.timedelta(hours=-1)
+    #组合成文件名
+    f_name="/app/tomcat/logs/catalina."+t.strftime("%Y-%m-%d-%H")+".out"
+    return f_name
+#取得第一个关键字的行数
+def get_line(f_name):
+    with open(f_name, 'r') as fread:
+        lines = fread.readlines()
+        i=0
+        l_num=[]
+        for line in lines:
+            #第一个关键字
+            keyword1="Could not connect to SMTP host"
+            rs1 = re.search(keyword1, line)
+            i+=1
+            if rs1:
+                #第一个关键字的行号
+                l_num.append(i)
+    return l_num
+#根据第一个关键字的行数向上查找到第二个关键字
+def get_log(f_name, num):
+    with open(f_name, 'r') as fread:
+        #把文件倒过来，从第一个关键字所在的行开始查找
+        rlines = fread.readlines()[::-1]
+        j=0
+        rs_str=[]
+        for j in range(len(rlines)-num,len(rlines)):
+            #第二个关键字的正则表达式
+            keyword2="U000\d{4},.*@.*,.\d{2}"
+            rs2 = re.search(keyword2, rlines[j])
+            j+=1
+            if rs2:
+                #第二个关键字的内容，J由于上面+1了，所以要-1
+                rs_str.append(rlines[j-1])
+                break
+    return rs_str
+def main():
+    #打印说明文字
+    print "Please input alerttime, YYYYMMDDHH exp:2017010113"
+    print "Enter for default (now)"
+    #要求输入
+    input_str = raw_input("input: ")
+    #取得文件名
+    f_name = get_filename(input_str)
+    #判断文件是否存在
+    if os.path.isfile(f_name):
+        l_num = get_line(f_name)
+        if l_num:
+            for num in l_num:
+                rs_str=get_log(f_name, num)
+                if rs_str:
+                    #找到日志时的输出
+                    print "-----------------"
+                    print rs_str[0]
+                    print "javax.mail.MessagingException: Could not connect to SMTP host: smtp.partner.outlook.cn, port: 587;"
+                    print "-----------------"
+        #未找到相关日志时的输出
+        else:
+            print "-----------------"
+            print "No Log Found"
+            print "-----------------"
+    #文件不存在时的输出
+    else:
+        print "-----------------"
+        print "File not exist, please check again"
+        print "-----------------"
+if __name__ == '__main__':
+    main()
+```
+
+输出为
+>[root@test logs]# ./findlog.py  
+Please input alerttime, YYYYMMDDHH exp:2017010113  
+Enter for default (now)  
+input: 2017083116  
+\-----------------  
+2017-08-31 15:00:16,070 DEBUG [java.sql.ResultSet] - {rset-187333} Result: [U0000448, test-test1@test.com, ??Buyer, 00]   
+javax.mail.MessagingException: Could not connect to SMTP host: smtp.partner.outlook.cn, port: 587;  
+\-----------------  
+\-----------------  
+2017-08-31 15:38:15,980 DEBUG [java.sql.ResultSet] - {rset-187333} Result: [U0000449, test-test2@test.com, ??Buyer, 00]  
+javax.mail.MessagingException: Could not connect to SMTP host: smtp.partner.outlook.cn, port: 587;  
+\-----------------
