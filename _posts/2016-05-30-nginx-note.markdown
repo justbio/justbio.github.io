@@ -16,6 +16,7 @@ nginx开启后会启动3个进程master process，worker process，cache manager
 本参数指定了master process以外的进程的用户。
 master process是用root启动的。
 
+<!-- more -->
 
 #### worker_processes
 

@@ -9,6 +9,8 @@ title:  "TOMCAT相关的笔记"
 #### JVM的内存
 ![](../assets/739083-20160415164833566-639029606.png)
 
+<!-- more -->
+
 #### 内存分配
 1. -XX:PermSize尽量比-XX:MaxPermSize小，-XX:MaxPermSize>= 2 * -XX:PermSize, -XX:PermSize> 64m，一般对于4G内存的机器，-XX:MaxPermSize不会超过256m；  
 2. -Xms =  -Xmx（线上Server模式），以防止抖动，大小受操作系统和内存大小限制，如果是32位系统，则一般-Xms设置为1g-2g（假设有4g内存），在64位系统上，没有限制，不过一般为机器最大内存的一半左右；

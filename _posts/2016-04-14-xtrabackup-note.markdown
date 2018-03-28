@@ -8,6 +8,8 @@ title:  "XTRABACKUP备份笔记"
 >rpm -Uhv http://www.percona.com/downloads/percona-release/percona-release-0.0-1.x86_64.rpm  
 yum install xtrabackup
 
+<!-- more -->
+
 备份
 >innobackupex /backup/xtrabackup/
 

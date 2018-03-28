@@ -13,6 +13,7 @@ title:  "ZABBIX冗余架构构筑（CENTOS6.4+PACEMAKER+COROSYNC+DRBD）"
 5. 主机在drbd领域中创建/drbd/zabbix，挂载至/etc/zabbix，备机不挂载
 6. 主机在drbd领域中创建/drbd/mysql，挂载至/var/lib/mysql，备机不挂载
  
+<!-- more -->
 主机正常时如左图，主机故障时如右图  
 ![](../assets/739083-20160531140053571-494188360.jpg)
 
