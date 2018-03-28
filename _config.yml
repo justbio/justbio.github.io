@@ -1,4 +1,5 @@
 markdown: kramdown
+highlighter: rouge
 kramdown:
   input: GFM
   auto_ids:       true
@@ -15,7 +16,7 @@ kramdown:
     - footnotes
     - smart
     - table
-highlighter: rouge
+
 permalink: /posts/:title.html
 excerpt_separator: "<!-- more -->"
 
