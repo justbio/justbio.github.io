@@ -10,6 +10,8 @@ catalina.out的日志中，先找到第一个关键字，  然后向上查找第
 
 由于不能改客户的环境，所以是python2的
 
+<!-- more -->
+
 ```
 #!/usr/bin/python 
 import datetime, time
