@@ -1,6 +1,6 @@
 ---
 layout: post
-category: "Github"
+category: "github"
 title:  "apache access日志统计做图"
 ---
 

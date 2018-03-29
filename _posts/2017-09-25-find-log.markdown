@@ -1,6 +1,6 @@
 ---
 layout: post
-category: "python"
+category: "program"
 title:  "日志查找到第一个关键字后反向查找第二个关键字"
 ---
 
