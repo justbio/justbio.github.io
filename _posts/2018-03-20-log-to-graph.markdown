@@ -14,6 +14,8 @@ title:  "apache access日志统计做图"
 > 暂时只支持默认格式的日志  
 > LogFormat:"%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 
+<!-- more -->
+
 需求
 ------------
 #### Base
