@@ -55,8 +55,8 @@ shapefile
 
 Example
 ------------
-![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/day_bar.png)
-![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/hour_bar.png)
-![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/URL_bar.png)
-![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/china_scatter.png)
-![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/world_scatter.png)
+![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/day_bar.png?raw=true)
+![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/hour_bar.png?raw=true)
+![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/URL_bar.png?raw=true)
+![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/china_scatter.png?raw=true)
+![](https://github.com/justbio/apache-log-to-graph/blob/master/pngs/example/world_scatter.png?raw=true)
