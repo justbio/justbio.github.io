@@ -13,6 +13,7 @@ dtype: 'int' 'float'
 np.zeros((row,col))    
 np.ones((row,col))  
 np.empty((row,col))
+np.random.rand((row,col))
 
 <!-- more -->
 
@@ -65,3 +66,12 @@ axis=1代表在行中计算，axis=0代表在列中计算
 新增维度 np.newaxis
 
 矩阵拼接 np.concatenate((a,b),axis=0/1)
+
+矩阵分割   
+等量分割 np.split(a,num,axis=0/1)  
+不等量分割 np.array_split(a,num,axis=0/1)  
+           np.vsplit(a,num)  
+           np.hsplit(a,num)  
+
+deepcopy b=a.copy()
+网格化 np.meshgrid(x,y)
