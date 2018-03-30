@@ -1,0 +1,65 @@
+---
+layout: post
+category: "read"
+title:  "Numpy笔记"
+---
+
+创建矩阵数组  
+array = np.array([[x,x,x],[y,y,y]],dtype=np.int)
+
+dtype: 'int' 'float'
+
+创建特殊矩阵  
+np.zeros((row,col))    
+np.ones((row,col))  
+np.empty((row,col))
+
+矩阵维数 array.ndim  
+矩阵行列数 array.shape  
+矩阵元素数 array.size   
+矩阵值类型 array.dtype  
+
+生成数列并转成数组  
+np.arange(start,stop,step)
+
+生成线段  
+np.linespace(start,stop,count)
+
+转成矩阵
+a.reshape((row,col))
+
+矩阵摊平  
+a.flatten()/a.flat
+
+三角函数  
+np.sin()  np.cos()  np.tan() 等等
+
+矩阵乘法  
+np.dot(a,b) 或者 a.dot(b)
+
+矩阵求和 np.sum(a,axis=0/1)  
+矩阵最小值 np.min(a,axis=0/1)  
+矩阵最大值 np.max(a,axis=0/1)  
+矩阵平均值 np.mean(a,axis=0/1)  
+矩阵中位数 np.median(a,axis=0/1)  
+矩阵累积 np.cumsum(a)
+矩阵位差 np.diff(a)
+
+axis=1代表在行中计算，axis=0代表在列中计算
+
+下标索引  
+最小值索引 np.argmin(a)  
+最大值索引 np.argmax(a)  
+
+矩阵不为0的值的下标 np.nonzero(a)  
+逐行排序  np.sort((a))  
+矩阵转置(行列互转) np.transpose(a)/a.T  
+矩阵修剪(min,max以外的值会被修剪为min/max) np.clip(a,min,max)  
+
+数列堆叠  
+纵向堆叠 np.vstack((a,b))  
+横向堆叠 np.hstack((a,b))
+
+新增维度 np.newaxis
+
+矩阵拼接 np.concatenate((a,b),axis=0/1)
