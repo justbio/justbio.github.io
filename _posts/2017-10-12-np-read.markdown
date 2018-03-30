@@ -14,6 +14,8 @@ np.zeros((row,col))
 np.ones((row,col))  
 np.empty((row,col))
 
+<!-- more -->
+
 矩阵维数 array.ndim  
 矩阵行列数 array.shape  
 矩阵元素数 array.size   
