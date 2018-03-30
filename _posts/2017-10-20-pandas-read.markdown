@@ -14,6 +14,8 @@ pd.date_range(date,periods=num)
 pd.DataFrame(matixdata，index=rownames，columns=colnames)  
 pd.DataFrame(dictionarydata)
 
+<!-- more -->
+
 dataframe行名称 df.index  
 dataframe列名称 df.columns  
 dataframe值 df.values   
@@ -40,8 +42,11 @@ data.to_pickle(pklfile)
 pd.concat([df1,df2,df3],axis=0/1,ignore_index=True)  
 pd.concat([df1,df2,df3],join="inner/outer",ignore_index=True)  
 pd.concat([df1,df2,df3],join_axis=[df1.index],ignore_index=True)
+df1.append([df2,df3],ignore_index=True)
 
+pd.merge(df1,df2,on="col")  
+pd.merge(df1,df2,on=["col1","col2"],how="inner/outer/left/right")
 
-
-
-
+pd.merge(df1,df2,left_index=True,right_index=True,how="i/o/l/r")  
+pd.merge(df1,df2,on="col",suffixes=["",""],how="i/o/l/r")
+  
