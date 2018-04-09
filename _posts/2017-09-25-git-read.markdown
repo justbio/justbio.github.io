@@ -1,0 +1,51 @@
+---
+layout: post
+category: "read"
+title:  "Git笔记"
+---
+
+GitConfig   
+git config --global user.name "justbio"  
+git config --global user.email "justbio@163.com"  
+git config user.name
+
+创建管理库   
+git init
+
+查看状态  
+git status -s
+
+添加文件  
+git add .
+
+查看日志  
+git log
+git reflog
+git log --online --graph
+
+提交  
+git commit -m "change1"  
+git commit --amend --no-edit  
+git commit -am "change3"
+
+查看更改细节  
+git diff  
+git diff --cached  
+git diff HEAD
+
+回溯  
+git reset 1.py  
+git reset --hard HEAD  
+git reset --hard HEAD^  
+git reset --hard id  
+git checkout id -- 1.py
+
+分支  
+git branch dev  
+git branch -d dev  
+git checkout -b dev  
+git merge --no-ff -m "merge" dev
+
+临时修改  
+git stash
+git stash pop
