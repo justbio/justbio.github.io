@@ -16,6 +16,8 @@ plt.scatter(x,y,s=n,c='color',alpha=n)
 柱状图  
 plt.bar(x,y,facecolor'color',edgecolor='color',)
 
+<!-- more -->
+
 等高线图  
 X,Y = np.meshgrid(x,y)  
 plt.contourf(X,Y,Z,n,alpha=0.7,cmap=plt.cm.hot)  

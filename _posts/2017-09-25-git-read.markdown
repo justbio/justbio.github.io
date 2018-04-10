@@ -18,6 +18,8 @@ git status -s
 添加文件  
 git add .
 
+<!-- more -->
+
 查看日志  
 git log
 git reflog
