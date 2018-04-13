@@ -9,9 +9,9 @@ import tkinter as tk
 创建窗口  
 window = tk.Tk()  
 window.title("name")  
-window.geometry('heightxwidth') 
-top=tk.Toplevel(window) 
-window.mainloop()
+window.geometry('heightxwidth')  
+top=tk.Toplevel(window)  
+window.mainloop() 
 
 关闭窗口  
 window.destroy()
@@ -99,7 +99,10 @@ tk.messagebox.askokcancel(title="text",message="text")
 .grid(row=n,column=m,padx=x,pady=y,ipadx=x1,ipady=y1)  
 .place(x=n,y=m,anchor="position")
 
+选择文件的窗口  
+import tkinter.filedialog  
 
+tkinter.filedialog.askopenfilename()
 
 
 
