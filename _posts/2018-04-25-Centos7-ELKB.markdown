@@ -10,7 +10,8 @@ ELKB：Elasticsearch+logstash+kibana+beats
 
 beats模块我们这次只会用到filebeat，  
 B安装在客户机上，ELK安装在服务端上。  
-###Java8安装
+
+### Java8安装
 ELK的新版本需要java8  
 从官方下载jdk-8u171-linux-x64.rpm  
 安装
@@ -20,7 +21,7 @@ ELK的新版本需要java8
 
 <!-- more -->
 
-###Elasticsearch安装配置
+### Elasticsearch安装配置
 先导入GPGkey  
 ```
 # rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
@@ -51,7 +52,7 @@ network.host: localhost
 # systemctl start elasticsearch
 ```
 
-###Kibana安装配置
+### Kibana安装配置
 安装Kibana，repo是一样的，所以直接yum
 ```
 # yum install Kibana
@@ -66,7 +67,7 @@ server.host: "localhost"
 # systemctl start kibana
 ```
 
-###Nginx安装配置
+### Nginx安装配置
 先导入epel的repo
 ```
 # yum install epel-release
@@ -103,7 +104,7 @@ server {
 ```
 
 
-###Logstash安装配置
+### Logstash安装配置
 安装Logstash
 ```
 # yum install logstash
@@ -139,7 +140,7 @@ output {
 # systemctl start logstash
 ```
 
-###filebeat安装配置
+### filebeat安装配置
 在客户机上进行  
 先导入GPGkey  
 ```
@@ -183,7 +184,7 @@ output.logstash:
 # systemctl start filebeat
 ```
 
-###kibana页面配置
+### kibana页面配置
 打开http://192.168.0.10  
 输入上面创建的帐号密码  
 点击右下角的IndexPatterns  
@@ -201,7 +202,7 @@ Aggregation选Geohash，Field里选geoip.location,
 点击save，就可以用来展示了。  
 ![](../assets/dashboard.JPG) 
 
-###其他
+### 其他
 用高德地图
 ```
 vi /etc/kibana/kibana.yml
