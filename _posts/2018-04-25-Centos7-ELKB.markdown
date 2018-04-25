@@ -6,7 +6,7 @@ title:  "CENTOS7.x+ELKB6.x日志可视化构筑"
 
 ELKB：Elasticsearch+logstash+kibana+beats  
 官方架构说明如下图  
-![](../assets/elkb.jpg)  
+![](../assets/elkb.JPG)  
 
 beats模块我们这次只会用到filebeat，  
 B安装在客户机上，ELK安装在服务端上。  
@@ -199,7 +199,7 @@ Aggregation选Geohash，Field里选geoip.location,
 
 左边菜单点dashboard，点击add，选择刚才保存的visualization，  
 点击save，就可以用来展示了。  
-![](../assets/dashboard.jpg) 
+![](../assets/dashboard.JPG) 
 
 ###其他
 用高德地图
