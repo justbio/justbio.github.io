@@ -20,6 +20,8 @@ DocumentRoot "/usr/share/zabbix"
 <Directory "/usr/share/zabbix">
 ```
 
+<!-- more -->
+
 ###PHP部分
 PHP5.6依赖包安装
 ```
