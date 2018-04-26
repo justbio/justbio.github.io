@@ -205,7 +205,7 @@ Aggregation选Geohash，Field里选geoip.location,
 ### 其他
 用高德地图
 ```
-vi /etc/kibana/kibana.yml
+# vi /etc/kibana/kibana.yml
 tilemap.url: "http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}"
 ```
 高德地图做visualize的时候最开始会显示白屏，  
@@ -213,6 +213,6 @@ tilemap.url: "http://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=
 
 elasticsearch查看index列表
 ```
-curl 'localhost:9200/_cat/indices?v'
+# curl 'localhost:9200/_cat/indices?v'
 ```
 
