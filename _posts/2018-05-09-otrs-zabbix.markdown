@@ -120,6 +120,10 @@ Send message to users: otrs_server (otrs_server) via otrs
 修改40行和41行的为你自己的manager的帐号密码  
 [ticket.py](https://github.com/justbio/test/blob/ticket.py)
 
+### python3设置
+安装python3，并且安装python-otrs扩展包  
+pip3 install python-otrs
+
 OK这样当故障符合你设置的condition时，  
 zabbix就会自动去otrs开一个工单，  
 当故障恢复时，zabbix会自动关闭此工单并附上恢复的消息
