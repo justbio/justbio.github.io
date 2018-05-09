@@ -57,7 +57,7 @@ ManagerG由于拥有所有权限，两个队列都能看到
 1，web服务  
 新建web服务->导入web服务  
 从官方下载一个叫GenericTicketConnectorSOAP.yml的文件导入
-[GenericTicketConnectorSOAP.yml](https://github.com/justbio/test/blob/GenericTicketConnectorSOAP.yml)
+[GenericTicketConnectorSOAP.yml](https://github.com/justbio/test/blob/master/GenericTicketConnectorSOAP.yml)
 
 ## Zabbix的配置
 用admin账号进行zabbix的配置
@@ -68,9 +68,9 @@ Type：script
 Scriptname：ticket.py  
 Scriptparameters：{ALERT.SENDTO}，{ALERT.SUBJECT}，{ALERT.MESSAGE}  
 
-### Users
+### Users      
 新建两个用户otrs_server和otrs_network
-分别添加上面新建的Media：otrs
+分别添加上面新建的Media：otrs  
 其中otrs_server的Media的sendto填server  
 otrs_network的Media的sendto填network
 
@@ -116,9 +116,9 @@ Send message to users: otrs_server (otrs_server) via otrs
 内容的第4行第5行为Severity: {TRIGGER.SEVERITY}和Eventid: {EVENT.ID}  
 
 ### 上传脚本
-将以下脚本上传至alertscripts文件夹并赋予可执行权限
+将以下脚本上传至alertscripts文件夹并赋予可执行权限  
 修改40行和41行的为你自己的manager的帐号密码  
-[ticket.py](https://github.com/justbio/test/blob/ticket.py)
+[ticket.py](https://github.com/justbio/test/blob/master/ticket.py)
 
 ### python3设置
 安装python3，并且安装python-otrs扩展包  
