@@ -4,12 +4,12 @@ category: "zabbix"
 title:  "Zabbix3.x自动生成工单至OTRS"
 ---
 
-Zabbix server
-OS：CentOS6.8
+Zabbix server  
+OS：CentOS6.8  
 软件：Zabbix3.4、Mysql5.6、Python3.6
 
-OTRS server
-OS：CentOS7.4
+OTRS server  
+OS：CentOS7.4  
 软件：otrs-china-1.0.12
 
 <!-- more -->
