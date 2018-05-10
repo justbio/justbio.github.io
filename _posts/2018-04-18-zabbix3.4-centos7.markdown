@@ -40,7 +40,7 @@ always_populate_raw_post_data = -1
 ### mysql部分
 ```
 rpm -Uvh https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
-yum install --enablerepo=mysql-community --enablerepo=mysql56-community mysql-community-server mysql mysql-devel
+yum install --disablerepo=mysql80-community --enablerepo=mysql56-community mysql-community-server mysql mysql-devel
 ```
 编辑参数(8G内存)
 ```
