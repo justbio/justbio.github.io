@@ -64,7 +64,7 @@ vim /etc/ansible/zabbix_agentd.conf
 # Mandatory: no
 # Default:
 # Hostname=
-Hostname=\{{ inventory_hostname \}}
+Hostname={{ inventory_hostname }}
 ```  
 其他参数按实际需求修改
 
