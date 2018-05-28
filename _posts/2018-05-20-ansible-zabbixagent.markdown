@@ -15,10 +15,15 @@ vim /etc/ansible/ansible.cfg
 <!-- more -->
 
 ## 配置
+配置ssh密钥  
+ssh-keygen  
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.0.xx
+
 创建hosts文件  
 vim /etc/ansible/hosts
 ```
-ip1
+[webservers]
+192.168.0.xx
 ip2
 ip3
 ip4
@@ -68,17 +73,17 @@ ansible-playbook zabbix_agent.yaml
 ```
 PLAY [all] 
 TASK [Gathering Facts] 
-ok: [192.168.0.192]
+ok: [192.168.0.xx]
 TASK [copy zabbix-agent package]
-changed: [192.168.0.192]
+changed: [192.168.0.xx]
 TASK [install zabbix-agent package]
  [WARNING]: Consider using the yum, dnf or zypper module rather than running rpm.  If you need to use command because yum, dnf or zypper is
 insufficient you can add warn=False to this command task or set command_warnings=False in ansible.cfg to get rid of this message.
-changed: [192.168.0.192]
+changed: [192.168.0.xx]
 TASK [copy zabbix-agent conf]
-changed: [192.168.0.192]
+changed: [192.168.0.xx]
 RUNNING HANDLER [Restart Zabbix-agent Service] 
-changed: [192.168.0.192]
+changed: [192.168.0.xx]
 PLAY RECAP 
-192.168.0.192              : ok=5    changed=4    unreachable=0    failed=0   
+192.168.0.xx              : ok=5    changed=4    unreachable=0    failed=0   
 ```
