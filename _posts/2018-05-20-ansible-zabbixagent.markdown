@@ -87,3 +87,33 @@ changed: [192.168.0.xx]
 PLAY RECAP 
 192.168.0.xx              : ok=5    changed=4    unreachable=0    failed=0   
 ```
+
+如果不愿意搞ssh互信的话，密码可以直接写在hosts文件里  
+先安装sshpass  
+yum install -y sshpass  
+再修改hosts文件  
+vim /etc/ansible/hosts
+```
+[webservers]
+192.168.0.xx ansible_ssh_pass='passwd'
+ip2 ansible_ssh_pass='passwd'
+ip3 ansible_ssh_pass='passwd'
+ip4 ansible_ssh_pass='passwd'
+```
+
+另外补一个zabbix常用的playbook，修改/var/log/messages权限
+vim /etc/ansible/chmod_syslog.yaml  
+```
+\---
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: change syslog mode
+    file: dest=/var/log/messages owner=root group=root mode=0644
+  - name: change logrotate
+    lineinfile:
+      dest: /etc/logrotate.d/syslog
+      regexp: '^endscript'
+      insertbefore: '^}'
+      line: '    create 0644 root root'
+```
